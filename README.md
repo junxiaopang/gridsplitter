@@ -4,6 +4,8 @@ Gridsplitter 是一个强大的图片分割与 AI 提示词辅助工具，专为
 
 简体中文版 ｜ [English](README_en.md)
 
+演示地址：[https://cut.kkkm.cn](https://cut.kkkm.cn)
+
 ## ✨ 主要功能
 
 - **智能图片分割**：

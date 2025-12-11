@@ -4,6 +4,8 @@ Gridsplitter is a powerful image splitting and AI prompt assistant tool designed
 
 English ｜ [简体中文版](README.md)
 
+Demo: [https://cut.kkkm.cn](https://cut.kkkm.cn)
+
 ## ✨ Key Features
 
 - **Smart Image Splitting**:

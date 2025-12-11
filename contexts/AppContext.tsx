@@ -9,8 +9,6 @@ interface AppContextType {
   language: Language;
   toggleLanguage: () => void;
   t: (key: string) => string;
-  removeBgApiKey: string;
-  setRemoveBgApiKey: (key: string) => void;
 }
 
 const translations = {
@@ -39,7 +37,6 @@ const translations = {
     preset_line: "Line 风格",
     preset_3d: "3D 盲盒",
     btn_more: "更多提示词",
-    btn_ai: "AI 生成",
     input_placeholder: "输入主题，如：像素风小狗...",
     btn_generate: "生成",
     copy_success: "已复制",
@@ -64,15 +61,7 @@ const translations = {
     tool_move: "移动/缩放",
     tool_brush: "画笔/橡皮",
     tool_text: "添加文字",
-    tool_remove_bg: "一键抠图",
     tool_add_text: "点击编辑文字",
-    apikey_title: "配置 Remove.bg API Key",
-    apikey_desc: "获取免费 API Key 以启用高质量 AI 抠图功能。",
-    apikey_placeholder: "在此粘贴 API Key...",
-    apikey_save: "保存 Key",
-    apikey_missing: "未配置 API Key",
-    apikey_link: "获取 Key",
-    error_apikey: "请先点击右上角设置图标配置 Remove.bg API Key"
   },
   en: {
     app_title: "GridSplitter Pro",
@@ -99,7 +88,6 @@ const translations = {
     preset_line: "Line Style",
     preset_3d: "3D Blind Box",
     btn_more: "More Prompts",
-    btn_ai: "AI Gen",
     input_placeholder: "Enter topic, e.g., Pixel art dog...",
     btn_generate: "Generate",
     copy_success: "Copied",
@@ -122,13 +110,6 @@ const translations = {
     editor_save: "Save Changes",
     editor_reset: "Reset Canvas",
     tool_move: "Move/Scale",
-    tool_brush: "Brush/Eraser",
-    tool_text: "Add Text",
-    tool_remove_bg: "Remove BG",
-    tool_add_text: "Double click to edit",
-    apikey_title: "Config Remove.bg API Key",
-    apikey_desc: "Get free API Key to enable AI background removal.",
-    apikey_placeholder: "Paste API Key here...",
     apikey_save: "Save Key",
     apikey_missing: "Missing API Key",
     apikey_link: "Get Key",
@@ -141,16 +122,13 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>('light');
   const [language, setLanguage] = useState<Language>('zh');
-  const [removeBgApiKey, setRemoveBgApiKeyState] = useState<string>('');
 
   // Initialize theme from system preference
   useEffect(() => {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       setTheme('dark');
     }
-    // Load API Key
-    const savedKey = localStorage.getItem('remove_bg_api_key');
-    if (savedKey) setRemoveBgApiKeyState(savedKey);
+
   }, []);
 
   // Update HTML class for Tailwind dark mode
@@ -171,17 +149,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setLanguage(prev => prev === 'zh' ? 'en' : 'zh');
   };
 
-  const setRemoveBgApiKey = (key: string) => {
-    setRemoveBgApiKeyState(key);
-    localStorage.setItem('remove_bg_api_key', key);
-  };
+
 
   const t = (key: string): string => {
     return (translations[language] as any)[key] || key;
   };
 
   return (
-    <AppContext.Provider value={{ theme, toggleTheme, language, toggleLanguage, t, removeBgApiKey, setRemoveBgApiKey }}>
+    <AppContext.Provider value={{ theme, toggleTheme, language, toggleLanguage, t }}>
       {children}
     </AppContext.Provider>
   );

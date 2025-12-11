@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Icons } from './Icon';
 import { useApp } from '../contexts/AppContext';
 import { SliceData } from '../types';
-import { removeImageBackgroundAPI, downloadImage } from '../utils/imageProcessing';
+import { downloadImage } from '../utils/imageProcessing';
 
 // Fabric is loaded globally via script tag in index.html to avoid ESM compatibility issues with v5
 // declare var fabric: any; // Already in types.ts
@@ -14,7 +14,7 @@ interface SliceEditorProps {
 }
 
 export const SliceEditor: React.FC<SliceEditorProps> = ({ slice, onSave, onClose }) => {
-  const { t, removeBgApiKey } = useApp();
+  const { t } = useApp();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvas = useRef<any>(null); // Fabric canvas instance
   const containerRef = useRef<HTMLDivElement>(null);
@@ -97,40 +97,7 @@ export const SliceEditor: React.FC<SliceEditorProps> = ({ slice, onSave, onClose
     setActiveTool('move');
   };
 
-  const handleRemoveBg = async () => {
-    if (!fabricCanvas.current) return;
-    
-    if (!removeBgApiKey) {
-      alert(t('error_apikey'));
-      return;
-    }
 
-    const canvas = fabricCanvas.current;
-    const activeObj = canvas.getActiveObject();
-
-    // Check if an image is selected
-    if (activeObj && activeObj.type === 'image') {
-      setIsProcessing(true);
-      try {
-        // Get the source of the image
-        const src = activeObj.getSrc();
-        // Call API
-        const noBgSrc = await removeImageBackgroundAPI(src, removeBgApiKey);
-        
-        // Replace image
-        activeObj.setSrc(noBgSrc, () => {
-          canvas.renderAll();
-          setIsProcessing(false);
-        });
-      } catch (e: any) {
-        console.error(e);
-        alert(`Failed: ${e.message}`);
-        setIsProcessing(false);
-      }
-    } else {
-      alert("Please select an image object first.");
-    }
-  };
 
   const handleReset = () => {
     if (!fabricCanvas.current) return;

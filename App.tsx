@@ -4,7 +4,7 @@ import { PromptTabs } from './components/PromptTabs';
 import { BrandCard } from './components/BrandCard';
 import { ImageCropper } from './components/ImageCropper';
 import { SliceEditor } from './components/SliceEditor';
-import { getCroppedImg, generateSlices, downloadImage, removeImageBackgroundAPI, padImageToSquare } from './utils/imageProcessing';
+import { getCroppedImg, generateSlices, downloadImage, padImageToSquare } from './utils/imageProcessing';
 import { Brand, CropArea, SliceData } from './types';
 import { useApp } from './contexts/AppContext';
 import JSZip from 'jszip';
@@ -17,7 +17,7 @@ const BRANDS: Brand[] = [
 ];
 
 function App() {
-  const { theme, toggleTheme, language, toggleLanguage, t, removeBgApiKey, setRemoveBgApiKey } = useApp();
+  const { theme, toggleTheme, language, toggleLanguage, t } = useApp();
   
   // State
   const [originalImage, setOriginalImage] = useState<string | null>(null);
@@ -31,11 +31,8 @@ function App() {
   
   const [isCropping, setIsCropping] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isRemovingBg, setIsRemovingBg] = useState(false);
   const [isZipping, setIsZipping] = useState(false);
   const [isCentering, setIsCentering] = useState(false);
-  
-  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
 
   // Editor State
   const [editingSlice, setEditingSlice] = useState<SliceData | null>(null);
@@ -94,27 +91,7 @@ function App() {
     setCols(rows);
   };
 
-  // Background Removal Handler (Main Image)
-  const handleRemoveBackground = async () => {
-    if (!currentImage) return;
-    
-    if (!removeBgApiKey) {
-       setShowApiKeyModal(true);
-       return;
-    }
 
-    setIsRemovingBg(true);
-    try {
-      const newImage = await removeImageBackgroundAPI(currentImage, removeBgApiKey);
-      setCurrentImage(newImage);
-      // setOriginalImage(newImage); // Optional: keep original allows resetting
-    } catch (error: any) {
-      console.error("Failed to remove background", error);
-      alert(`Error: ${error.message}`);
-    } finally {
-      setIsRemovingBg(false);
-    }
-  };
 
   // Download Handlers
   const handleDownloadAll = async () => {
@@ -184,15 +161,16 @@ function App() {
                </span>
              )}
              <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1" />
-             {/* <button onClick={() => setShowApiKeyModal(true)} className="p-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" title={t('apikey_title')}>
-                <Icons.Key className="w-5 h-5" />
-             </button> */}
              <button onClick={toggleLanguage} className="p-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                 <Icons.Languages className="w-5 h-5" />
              </button>
              <button onClick={toggleTheme} className="p-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
                 {theme === 'light' ? <Icons.Moon className="w-5 h-5" /> : <Icons.Sun className="w-5 h-5" />}
              </button>
+             {/* github */}
+             <a href="https://github.com/junxiaopang/gridsplitter" target="_blank" rel="noopener noreferrer" className="p-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                <Icons.Github className="w-5 h-5" />
+             </a>
           </div>
         </div>
       </header>
@@ -246,14 +224,7 @@ function App() {
                      
                      {/* Overlay Actions */}
                      <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
-                        {/* <button 
-                          onClick={handleRemoveBackground}
-                          disabled={isRemovingBg}
-                          className="px-4 py-2 bg-slate-900/80 dark:bg-white/90 backdrop-blur-md text-white dark:text-slate-900 rounded-lg text-sm font-medium hover:bg-black dark:hover:bg-white flex items-center gap-2 shadow-xl border border-white/10 dark:border-black/10 disabled:opacity-70 disabled:cursor-wait"
-                        >
-                          {isRemovingBg ? <Icons.Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Icons.Wand2 className="w-3.5 h-3.5" />}
-                          {isRemovingBg ? t('removing_bg') : t('remove_bg')}
-                        </button> */}
+
                         <button 
                           onClick={() => setIsCropping(true)}
                           className="px-4 py-2 bg-slate-900/80 dark:bg-white/90 backdrop-blur-md text-white dark:text-slate-900 rounded-lg text-sm font-medium hover:bg-black dark:hover:bg-white flex items-center gap-2 shadow-xl border border-white/10 dark:border-black/10"
@@ -335,7 +306,7 @@ function App() {
             {/* Banner Ads Section */}
             <div className="hidden md:grid md:grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
               {/* Ad 1: Upscale */}
-              <a href="http://nav.kkkm.cn/?category=repair" className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 p-6 text-white shadow-lg hover:shadow-blue-500/30 transition-all hover:-translate-y-1 block">
+              <a href="http://nav.kkkm.cn/?category=images" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 p-6 text-white shadow-lg hover:shadow-blue-500/30 transition-all hover:-translate-y-1 block">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
                    <Icons.Zap className="w-24 h-24" />
                 </div>
@@ -354,7 +325,7 @@ function App() {
               </a>
 
               {/* Ad 2: Animate */}
-              <a href="http://localhost:3000/?category=video" className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 p-6 text-white shadow-lg hover:shadow-purple-500/30 transition-all hover:-translate-y-1 block">
+              <a href="http://nav.kkkm.cn/?category=video" target="_blank" rel="noopener noreferrer" className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 p-6 text-white shadow-lg hover:shadow-purple-500/30 transition-all hover:-translate-y-1 block">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
                    <Icons.Clapperboard className="w-24 h-24" />
                 </div>
@@ -365,11 +336,10 @@ function App() {
                    </div>
                    <h3 className="text-xl font-bold mb-1">{t('ad_animate_title')}</h3>
                    <p className="text-purple-50 text-sm mb-4 leading-relaxed opacity-90">{t('ad_animate_desc')}</p>
-                   <a href="https://www.doubao.com/chat/create-image" target="_blank">
                    <div className="inline-flex items-center gap-1.5 text-xs font-bold bg-white text-purple-600 px-3 py-1.5 rounded-full group-hover:bg-purple-50 transition-colors">
                       {t('ad_animate_btn')}
                       <Icons.ExternalLink className="w-3 h-3" />
-                   </div></a>
+                   </div>
                 </div>
               </a>
             </div>
@@ -480,7 +450,15 @@ function App() {
 
       {/* Footer */}
       <footer className="py-8 text-center text-slate-400 dark:text-slate-600 text-sm font-medium">
-        <span>© {new Date().getFullYear()} 快码·AI实验室</span>
+        <span>© {new Date().getFullYear()} <a 
+          href="http://www.kkkm.cn" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+        >
+          快码·AI实验室
+        </a></span>
+        
         <span className="mx-2">•</span>
         <a 
           href="http://www.kkkm.cn" 
@@ -512,49 +490,7 @@ function App() {
         />
       )}
 
-      {/* API Key Modal */}
-      {showApiKeyModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 border border-slate-200 dark:border-slate-800 relative">
-             <button onClick={() => setShowApiKeyModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-               <Icons.X className="w-5 h-5" />
-             </button>
-             
-             <div className="mb-6 flex flex-col items-center text-center">
-               <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4">
-                 <Icons.Key className="w-6 h-6" />
-               </div>
-               <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">{t('apikey_title')}</h3>
-               <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">{t('apikey_desc')}</p>
-             </div>
 
-             <div className="space-y-4">
-               <div>
-                  <input 
-                    type="password" 
-                    value={removeBgApiKey}
-                    onChange={(e) => setRemoveBgApiKey(e.target.value)}
-                    placeholder={t('apikey_placeholder')}
-                    className="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-800 dark:text-slate-100"
-                  />
-               </div>
-               <button 
-                 onClick={() => setShowApiKeyModal(false)}
-                 className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold shadow-lg shadow-indigo-500/20 transition-all"
-               >
-                 {t('apikey_save')}
-               </button>
-               <a 
-                 href="https://www.remove.bg/dashboard#api-key" 
-                 target="_blank"
-                 className="block text-center text-xs text-indigo-500 hover:text-indigo-600 font-medium"
-               >
-                 {t('apikey_link')} →
-               </a>
-             </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

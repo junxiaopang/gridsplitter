@@ -25,7 +25,8 @@ import {
   MousePointer2,
   Move,
   AlignCenter,
-  Key
+  Key,
+  Github
 } from 'lucide-react';
 
 export const Icons = {
@@ -54,5 +55,6 @@ export const Icons = {
   MousePointer2,
   Move,
   AlignCenter,
-  Key
+  Key,
+  Github
 };

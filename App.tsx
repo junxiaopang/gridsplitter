@@ -53,6 +53,51 @@ function App() {
     }
   };
 
+  // Cross-window Message Handler (for UserScript)
+  useEffect(() => {
+    // List of trusted domains that can send images to this app
+    const ALLOWED_ORIGINS = [
+      'https://gemini.google.com',
+      'https://chatgpt.com',
+      'https://claude.ai',
+      'https://www.midjourney.com',
+      'https://www.doubao.com',
+      'https://www.runninghub.cn',
+      'https://jimeng.jianying.com/'
+    ];
+
+    const handleMessage = (event: MessageEvent) => {
+      // 🛑 Security Check: Only accept messages from trusted origins
+      // 屏蔽/删除这段代码可以不检测来源
+      if (!ALLOWED_ORIGINS.includes(event.origin)) {
+        return;
+      }
+
+      if (event.data?.type === 'IMPORT_IMAGE' && event.data?.imageData) {
+        // Validate that data is actually an image DataURL
+        if (typeof event.data.imageData === 'string' && event.data.imageData.startsWith('data:image/')) {
+          setOriginalImage(event.data.imageData);
+          setCurrentImage(event.data.imageData);
+        }
+      } else if (event.data?.type === 'PING') {
+        // Reply specifically to the origin that sent the PING
+        (event.source as Window)?.postMessage({ type: 'RECEIVER_READY' }, event.origin);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    
+    // Initial notification for the opener
+    if (window.opener) {
+      // Note: We use '*' here for the very first handshake because we might not 
+      // know the exact origin of the opener before any message is received.
+      // However, the actual image data is only processed after the secure handshake.
+      window.opener.postMessage({ type: 'RECEIVER_READY' }, '*');
+    }
+
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
   // Update slices when image or grid config changes
   useEffect(() => {
     if (currentImage) {
